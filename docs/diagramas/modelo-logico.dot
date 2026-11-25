@@ -1,0 +1,139 @@
+/* =====================================================================
+   Modelo Logico normalizado (3FN) - Sistema de Gestao para Clinica Medica
+   Render:  dot -Tpng modelo-logico.dot -o modelo-logico.png
+            dot -Tpdf modelo-logico.dot -o modelo-logico.pdf
+   ===================================================================== */
+digraph MODELO_LOGICO {
+    graph [rankdir=LR, splines=spline, nodesep=0.5, ranksep=1.1,
+           fontname="Helvetica", fontsize=13, labelloc="t", bgcolor="white",
+           label="\nModelo Logico Normalizado ate a 3FN - Sistema de Gestao para Clinica Medica\nPK = chave primaria | FK = chave estrangeira | UK = chave unica | As tabelas em laranja resolvem relacionamentos N:N\n"];
+    node  [shape=plaintext, fontname="Helvetica", fontsize=10];
+    edge  [color="#1f3b63", arrowhead=normal, arrowtail=none, penwidth=1.2,
+           fontname="Helvetica", fontsize=10, fontcolor="#1f3b63"];
+
+    cidades [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>cidades</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> cidade_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK nome + uf</TD></TR>
+      </TABLE>>];
+
+    convenios [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>convenios</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> convenio_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK nome</TD></TR>
+        <TR><TD ALIGN="LEFT">UK registro_ans</TD></TR>
+        <TR><TD ALIGN="LEFT">ativo</TD></TR>
+      </TABLE>>];
+
+    pacientes [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>pacientes</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> paciente_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK cpf</TD></TR>
+        <TR><TD ALIGN="LEFT">nome</TD></TR>
+        <TR><TD ALIGN="LEFT">data_nascimento</TD></TR>
+        <TR><TD ALIGN="LEFT">email</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk_conv"><B>FK</B> convenio_id</TD></TR>
+        <TR><TD ALIGN="LEFT">numero_carteirinha</TD></TR>
+        <TR><TD ALIGN="LEFT">cep / logradouro / numero</TD></TR>
+        <TR><TD ALIGN="LEFT">complemento / bairro</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk_cid"><B>FK</B> cidade_id</TD></TR>
+      </TABLE>>];
+
+    telefones [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>telefones_paciente</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> telefone_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk"><B>FK</B> paciente_id</TD></TR>
+        <TR><TD ALIGN="LEFT">tipo</TD></TR>
+        <TR><TD ALIGN="LEFT">UK numero (por paciente)</TD></TR>
+      </TABLE>>];
+
+    especialidades [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>especialidades</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> especialidade_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK nome</TD></TR>
+      </TABLE>>];
+
+    medicos [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>medicos</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> medico_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK crm + uf_crm</TD></TR>
+        <TR><TD ALIGN="LEFT">nome</TD></TR>
+        <TR><TD ALIGN="LEFT">email</TD></TR>
+        <TR><TD ALIGN="LEFT">ativo</TD></TR>
+      </TABLE>>];
+
+    med_esp [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#a86a1c"><FONT COLOR="white"><B>medicos_especialidades</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk1" BGCOLOR="#fdf1e0"><B>PK, FK</B> medico_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk2" BGCOLOR="#fdf1e0"><B>PK, FK</B> especialidade_id</TD></TR>
+        <TR><TD ALIGN="LEFT">rqe</TD></TR>
+        <TR><TD ALIGN="LEFT">principal</TD></TR>
+      </TABLE>>];
+
+    consultas [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>consultas</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> consulta_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk_pac"><B>FK</B> paciente_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk_med"><B>FK</B> medico_id + especialidade_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK medico_id + data_hora (parcial)</TD></TR>
+        <TR><TD ALIGN="LEFT">data_hora</TD></TR>
+        <TR><TD ALIGN="LEFT">situacao</TD></TR>
+        <TR><TD ALIGN="LEFT">observacoes</TD></TR>
+      </TABLE>>];
+
+    procedimentos [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>procedimentos</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> procedimento_id</TD></TR>
+        <TR><TD ALIGN="LEFT">UK codigo_tuss</TD></TR>
+        <TR><TD ALIGN="LEFT">nome</TD></TR>
+        <TR><TD ALIGN="LEFT">valor_tabela</TD></TR>
+      </TABLE>>];
+
+    cons_proc [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#a86a1c"><FONT COLOR="white"><B>consultas_procedimentos</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk1" BGCOLOR="#fdf1e0"><B>PK, FK</B> consulta_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk2" BGCOLOR="#fdf1e0"><B>PK, FK</B> procedimento_id</TD></TR>
+        <TR><TD ALIGN="LEFT">quantidade</TD></TR>
+        <TR><TD ALIGN="LEFT">valor_cobrado</TD></TR>
+      </TABLE>>];
+
+    pagamentos [label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+        <TR><TD BGCOLOR="#1f3b63"><FONT COLOR="white"><B>pagamentos</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="pk"><B>PK</B> pagamento_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="fk"><B>FK, UK</B> consulta_id</TD></TR>
+        <TR><TD ALIGN="LEFT">valor</TD></TR>
+        <TR><TD ALIGN="LEFT">forma</TD></TR>
+        <TR><TD ALIGN="LEFT">pago_em</TD></TR>
+      </TABLE>>];
+
+    registro [label=<
+      <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#5b3fa6" STYLE="dashed">
+        <TR><TD BGCOLOR="#eae3f7"><FONT COLOR="#5b3fa6"><B>registros_clinicos (MongoDB)</B></FONT></TD></TR>
+        <TR><TD ALIGN="LEFT">_id</TD></TR>
+        <TR><TD ALIGN="LEFT" PORT="ref">consulta_id (referencia logica)</TD></TR>
+        <TR><TD ALIGN="LEFT">conteudo variavel por especialidade</TD></TR>
+      </TABLE>>];
+
+    cidades:pk    -> pacientes:fk_cid  [label="1:N"];
+    convenios:pk  -> pacientes:fk_conv [label="1:N"];
+    pacientes:pk  -> telefones:fk      [label="1:N"];
+    pacientes:pk  -> consultas:fk_pac  [label="1:N"];
+    medicos:pk    -> med_esp:fk1       [label="1:N", color="#a86a1c", fontcolor="#a86a1c"];
+    especialidades:pk -> med_esp:fk2   [label="1:N", color="#a86a1c", fontcolor="#a86a1c"];
+    med_esp:fk1   -> consultas:fk_med  [label="1:N"];
+    consultas:pk  -> cons_proc:fk1     [label="1:N", color="#a86a1c", fontcolor="#a86a1c"];
+    procedimentos:pk -> cons_proc:fk2  [label="1:N", color="#a86a1c", fontcolor="#a86a1c"];
+    consultas:pk  -> pagamentos:fk     [label="1:1"];
+    consultas:pk  -> registro:ref      [label="1:1", style=dashed, color="#5b3fa6", fontcolor="#5b3fa6"];
+}

@@ -1,0 +1,122 @@
+/* =====================================================================
+   Modelo Entidade-Relacionamento (conceitual) - notacao de Chen
+   Sistema de Gestao para Clinica Medica - Semana 15
+   Render:  dot -Tpng mer-conceitual.dot -o mer-conceitual.png
+            dot -Tpdf mer-conceitual.dot -o mer-conceitual.pdf
+   ===================================================================== */
+graph MER {
+    graph [rankdir=TB, splines=true, overlap=false, nodesep=0.35,
+           ranksep=0.75, fontname="Helvetica", bgcolor="white",
+           label="\nModelo Entidade-Relacionamento (Conceitual) - Sistema de Gestao para Clinica Medica\nNotacao de Chen | Entidade (retangulo)  Relacionamento (losango)  Atributo (elipse)  Atributo multivalorado (elipse dupla)  Atributo identificador (sublinhado)\nCardinalidade minima e maxima (min,max) indicada no lado da propria entidade; o resumo 1:1 / 1:N / N:N aparece dentro do losango",
+           fontsize=13, labelloc="t"];
+    node  [fontname="Helvetica", fontsize=11];
+    edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+
+    /* ---------- Entidades ---------- */
+    node [shape=box, style="filled,bold", fillcolor="#dbe7f5", color="#1f3b63", penwidth=1.6, width=1.5];
+    PACIENTE; MEDICO; CONSULTA; PAGAMENTO; ESPECIALIDADE; PROCEDIMENTO; CONVENIO; CIDADE;
+
+    node [shape=box, style="filled,dashed", fillcolor="#eae3f7", color="#5b3fa6", penwidth=1.4];
+    REGISTRO_CLINICO [label="REGISTRO CLINICO\n(MongoDB)"];
+
+    /* ---------- Relacionamentos ---------- */
+    node [shape=diamond, style=filled, fillcolor="#fde8cd", color="#a86a1c", penwidth=1.4, height=0.7, width=1.5];
+    R_AGENDA   [label="agenda\n1:N"];
+    R_REALIZA  [label="realiza\n1:N"];
+    R_ATUA     [label="atua em\nN:N"];
+    R_EXECUTA  [label="executa\nN:N"];
+    R_GERA_PAG [label="gera\n1:1"];
+    R_POSSUI   [label="possui\n1:N"];
+    R_RESIDE   [label="reside em\n1:N"];
+    R_DOCUMENTA[label="documenta\n1:1", style="filled,dashed", color="#5b3fa6"];
+
+    /* ---------- Atributos ---------- */
+    node [shape=ellipse, style=filled, fillcolor="#f4f4f4", color="#777777", penwidth=1.0, height=0.38, fontsize=10];
+
+    /* Paciente */
+    PAC_ID   [label=<<U>cpf</U>>];
+    PAC_NOME [label="nome"];
+    PAC_NASC [label="data_nascimento"];
+    PAC_MAIL [label="email"];
+    PAC_END  [label="endereco\n(composto)"];
+    PAC_TEL  [label="telefone", shape=ellipse, peripheries=2, fillcolor="#fff6d9", color="#b08900"];
+
+    /* Medico */
+    MED_CRM  [label=<<U>crm + uf_crm</U>>];
+    MED_NOME [label="nome"];
+    MED_MAIL [label="email"];
+    MED_AT   [label="ativo"];
+
+    /* Consulta */
+    CON_ID   [label=<<U>codigo</U>>];
+    CON_DH   [label="data_hora"];
+    CON_SIT  [label="situacao"];
+    CON_OBS  [label="observacoes"];
+
+    /* Pagamento */
+    PAG_ID   [label=<<U>codigo</U>>];
+    PAG_VAL  [label="valor"];
+    PAG_FOR  [label="forma_pagamento"];
+    PAG_DT   [label="pago_em"];
+
+    /* Especialidade */
+    ESP_NOME [label=<<U>nome</U>>];
+
+    /* Procedimento */
+    PRO_TUSS [label=<<U>codigo_tuss</U>>];
+    PRO_NOME [label="nome"];
+    PRO_VAL  [label="valor_tabela"];
+
+    /* Convenio */
+    CNV_ANS  [label=<<U>registro_ans</U>>];
+    CNV_NOME [label="nome"];
+
+    /* Cidade */
+    CID_NOME [label=<<U>nome + uf</U>>];
+
+    /* Atributos dos relacionamentos N:N */
+    ATU_RQE  [label="rqe", fillcolor="#fdf1e0", color="#a86a1c"];
+    EXE_QTD  [label="quantidade", fillcolor="#fdf1e0", color="#a86a1c"];
+    EXE_VAL  [label="valor_cobrado", fillcolor="#fdf1e0", color="#a86a1c"];
+
+    /* ---------- Ligacao atributo -> entidade ---------- */
+    edge [len=1.0, color="#999999"];
+    PACIENTE -- {PAC_ID PAC_NOME PAC_NASC PAC_MAIL PAC_END PAC_TEL};
+    MEDICO   -- {MED_CRM MED_NOME MED_MAIL MED_AT};
+    CONSULTA -- {CON_ID CON_DH CON_SIT CON_OBS};
+    PAGAMENTO-- {PAG_ID PAG_VAL PAG_FOR PAG_DT};
+    ESPECIALIDADE -- ESP_NOME;
+    PROCEDIMENTO  -- {PRO_TUSS PRO_NOME PRO_VAL};
+    CONVENIO -- {CNV_ANS CNV_NOME};
+    CIDADE   -- CID_NOME;
+    R_ATUA   -- ATU_RQE [color="#c9a227"];
+    R_EXECUTA-- {EXE_QTD EXE_VAL} [color="#c9a227"];
+
+    /* ---------- Ligacao entidade -> relacionamento (cardinalidades) ---------- */
+    edge [color="#1f3b63", penwidth=1.5, fontcolor="#1f3b63", fontsize=11, len=1.6];
+
+    PACIENTE -- R_AGENDA  [label=" (0,N) "];
+    R_AGENDA -- CONSULTA  [label=" (1,1) "];
+
+    MEDICO   -- R_REALIZA [label=" (0,N) "];
+    R_REALIZA-- CONSULTA  [label=" (1,1) "];
+
+    MEDICO        -- R_ATUA [label=" (1,N) "];
+    R_ATUA        -- ESPECIALIDADE [label=" (0,N) "];
+
+    CONSULTA      -- R_EXECUTA [label=" (0,N) "];
+    R_EXECUTA     -- PROCEDIMENTO [label=" (0,N) "];
+
+    CONSULTA   -- R_GERA_PAG [label=" (0,1) "];
+    R_GERA_PAG -- PAGAMENTO  [label=" (1,1) "];
+
+    PACIENTE -- R_POSSUI [label=" (0,1) "];
+    R_POSSUI -- CONVENIO [label=" (0,N) "];
+
+    PACIENTE -- R_RESIDE [label=" (1,1) "];
+    R_RESIDE -- CIDADE   [label=" (0,N) "];
+
+    edge [color="#5b3fa6", style=dashed, fontcolor="#5b3fa6"];
+    CONSULTA    -- R_DOCUMENTA [label=" (0,1) "];
+    R_DOCUMENTA -- REGISTRO_CLINICO [label=" (1,1) "];
+}

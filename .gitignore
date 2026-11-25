@@ -1,0 +1,12 @@
+# Dumps e arquivos temporarios do banco
+*.dump
+*.backup
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
